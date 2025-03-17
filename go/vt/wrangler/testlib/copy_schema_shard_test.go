@@ -61,7 +61,7 @@ func copySchema(t *testing.T, useShardAsSource bool) {
 	defer vp.Close()
 
 	if err := ts.CreateKeyspace(context.Background(), "ks", &topodatapb.Keyspace{}); err != nil {
-		t.Fatalf("CreateKeyspace failed: %v", err)
+		require("CreateKeyspace failed: %v", err)
 	}
 
 	sourcePrimaryDb := fakesqldb.New(t).SetName("sourcePrimaryDb")
@@ -162,7 +162,7 @@ func copySchema(t *testing.T, useShardAsSource bool) {
 	waitForShardPrimary(t, wr, destinationPrimary.Tablet)
 
 	if err := vp.Run([]string{"CopySchemaShard", "--include-views", source, "ks/-40"}); err != nil {
-		t.Fatalf("CopySchemaShard failed: %v", err)
+		require("CopySchemaShard failed: %v", err)
 	}
 
 	// Check call count on destinationPrimaryDb
