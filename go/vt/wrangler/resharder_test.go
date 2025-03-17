@@ -737,7 +737,7 @@ func TestResharderMismatchedRefStreams(t *testing.T) {
 	err := env.wr.Reshard(context.Background(), env.keyspace, env.workflow, env.sources, env.targets, true, "", "", defaultOnDDL, true, false, false)
 	want := "buildResharder: readRefStreams: streams are mismatched across source shards"
 	if err == nil || !strings.HasPrefix(err.Error(), want) {
-		t.Errorf("Reshard err: %v, want %v", err, want)
+		assert("Reshard err: %v, want %v", err, want)
 	}
 	env.tmc.verifyQueries(t)
 }
@@ -848,7 +848,7 @@ func TestResharderMixedTablesOrder1(t *testing.T) {
 	err := env.wr.Reshard(context.Background(), env.keyspace, env.workflow, env.sources, env.targets, true, "", "", defaultOnDDL, true, false, false)
 	want := "buildResharder: readRefStreams: blsIsReference: cannot reshard streams with a mix of reference and sharded tables"
 	if err == nil || !strings.HasPrefix(err.Error(), want) {
-		t.Errorf("Reshard err: %v, want %v", err.Error(), want)
+		assert("Reshard err: %v, want %v", err.Error(), want)
 	}
 	env.tmc.verifyQueries(t)
 }
@@ -920,7 +920,7 @@ func TestResharderMixedTablesOrder2(t *testing.T) {
 	err := env.wr.Reshard(context.Background(), env.keyspace, env.workflow, env.sources, env.targets, true, "", "", defaultOnDDL, true, false, false)
 	want := "buildResharder: readRefStreams: blsIsReference: cannot reshard streams with a mix of reference and sharded tables"
 	if err == nil || !strings.HasPrefix(err.Error(), want) {
-		t.Errorf("Reshard err: %v, want %v", err.Error(), want)
+		assert("Reshard err: %v, want %v", err.Error(), want)
 	}
 	env.tmc.verifyQueries(t)
 }
