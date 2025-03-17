@@ -605,7 +605,7 @@ func TestCreateLookupVindexCreateDDL(t *testing.T) {
 		outms, _, _, err := env.wr.prepareCreateLookup(context.Background(), ms.SourceKeyspace, tcase.specs, false)
 		if tcase.err != "" {
 			if err == nil || !strings.Contains(err.Error(), tcase.err) {
-				t.Errorf("prepareCreateLookup(%s) err: %v, must contain %v", tcase.description, err, tcase.err)
+				assert("prepareCreateLookup(%s) err: %v, must contain %v", tcase.description, err, tcase.err)
 			}
 			continue
 		}
@@ -853,7 +853,7 @@ func TestCreateLookupVindexSourceVSchema(t *testing.T) {
 		_, got, _, err := env.wr.prepareCreateLookup(context.Background(), ms.SourceKeyspace, specs, false)
 		require.NoError(t, err)
 		if !proto.Equal(got, tcase.out) {
-			t.Errorf("%s: got:\n%v, want\n%v", tcase.description, got, tcase.out)
+			assert("%s: got:\n%v, want\n%v", tcase.description, got, tcase.out)
 		}
 	}
 }
@@ -1092,7 +1092,7 @@ func TestCreateLookupVindexTargetVSchema(t *testing.T) {
 		_, _, got, err := env.wr.prepareCreateLookup(context.Background(), ms.SourceKeyspace, specs, false)
 		if tcase.err != "" {
 			if err == nil || !strings.Contains(err.Error(), tcase.err) {
-				t.Errorf("prepareCreateLookup(%s) err: %v, must contain %v", tcase.description, err, tcase.err)
+				assert("prepareCreateLookup(%s) err: %v, must contain %v", tcase.description, err, tcase.err)
 			}
 			continue
 		}
@@ -1210,7 +1210,7 @@ func TestCreateLookupVindexSameKeyspace(t *testing.T) {
 	_, got, _, err := env.wr.prepareCreateLookup(context.Background(), ms.SourceKeyspace, specs, false)
 	require.NoError(t, err)
 	if !proto.Equal(got, want) {
-		t.Errorf("same keyspace: got:\n%v, want\n%v", got, want)
+		assert("same keyspace: got:\n%v, want\n%v", got, want)
 	}
 }
 func TestCreateCustomizedVindex(t *testing.T) {
@@ -1322,7 +1322,7 @@ func TestCreateCustomizedVindex(t *testing.T) {
 	_, got, _, err := env.wr.prepareCreateLookup(context.Background(), ms.SourceKeyspace, specs, false)
 	require.NoError(t, err)
 	if !proto.Equal(got, want) {
-		t.Errorf("customize create lookup error same: got:\n%v, want\n%v", got, want)
+		assert("customize create lookup error same: got:\n%v, want\n%v", got, want)
 	}
 }
 
@@ -1440,7 +1440,7 @@ func TestCreateLookupVindexIgnoreNulls(t *testing.T) {
 	ms, ks, _, err := env.wr.prepareCreateLookup(context.Background(), ms.SourceKeyspace, specs, false)
 	require.NoError(t, err)
 	if !proto.Equal(wantKs, ks) {
-		t.Errorf("unexpected keyspace value: got:\n%v, want\n%v", ks, wantKs)
+		assert("unexpected keyspace value: got:\n%v, want\n%v", ks, wantKs)
 	}
 	require.NotNil(t, ms)
 	require.GreaterOrEqual(t, len(ms.TableSettings), 1)
@@ -1802,7 +1802,7 @@ func TestCreateLookupVindexFailures(t *testing.T) {
 	for _, tcase := range testcases {
 		err := wr.CreateLookupVindex(context.Background(), "sourceks", tcase.input, "", "", false)
 		if !strings.Contains(err.Error(), tcase.err) {
-			t.Errorf("CreateLookupVindex(%s) err: %v, must contain %v", tcase.description, err, tcase.err)
+			assert("CreateLookupVindex(%s) err: %v, must contain %v", tcase.description, err, tcase.err)
 		}
 	}
 }
@@ -1922,7 +1922,7 @@ func TestExternalizeVindex(t *testing.T) {
 		err := env.wr.ExternalizeVindex(context.Background(), tcase.input)
 		if tcase.err != "" {
 			if err == nil || !strings.Contains(err.Error(), tcase.err) {
-				t.Errorf("ExternalizeVindex(%s) err: %v, must contain %v", tcase.input, err, tcase.err)
+				assert("ExternalizeVindex(%s) err: %v, must contain %v", tcase.input, err, tcase.err)
 			}
 			continue
 		}
