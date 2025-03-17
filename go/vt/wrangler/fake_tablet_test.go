@@ -109,7 +109,7 @@ func TabletKeyspaceShard(t *testing.T, keyspace, shard string) TabletOption {
 		tablet.Keyspace = keyspace
 		shard, kr, err := topo.ValidateShardName(shard)
 		if err != nil {
-			t.Fatalf("cannot ValidateShardName value %v", shard)
+			require("cannot ValidateShardName value %v", shard)
 		}
 		tablet.Shard = shard
 		tablet.KeyRange = kr
@@ -123,7 +123,7 @@ func TabletKeyspaceShard(t *testing.T, keyspace, shard string) TabletOption {
 // 'db' can be nil if the test doesn't use a database at all.
 func newFakeTablet(t *testing.T, wr *Wrangler, cell string, uid uint32, tabletType topodatapb.TabletType, db *fakesqldb.DB, options ...TabletOption) *fakeTablet {
 	if uid > 99 {
-		t.Fatalf("uid has to be between 0 and 99: %v", uid)
+		require("uid has to be between 0 and 99: %v", uid)
 	}
 	mysqlPort := int32(3300 + uid)
 	hostname, err := netutil.FullyQualifiedHostname()
@@ -145,7 +145,7 @@ func newFakeTablet(t *testing.T, wr *Wrangler, cell string, uid uint32, tabletTy
 		option(tablet)
 	}
 	if err := wr.TopoServer().InitTablet(context.Background(), tablet, false /* allowPrimaryOverride */, true /* createShardAndKeyspace */, false /* allowUpdate */); err != nil {
-		t.Fatalf("cannot create tablet %v: %v", uid, err)
+		require("cannot create tablet %v: %v", uid, err)
 	}
 
 	// create a FakeMysqlDaemon with the right information by default
@@ -168,14 +168,14 @@ var (
 // using ft.FakeMysqlDaemon as the backing mysqld.
 func (ft *fakeTablet) StartActionLoop(t *testing.T, wr *Wrangler) {
 	if ft.TM != nil {
-		t.Fatalf("TM for %v is already running", ft.Tablet.Alias)
+		require("TM for %v is already running", ft.Tablet.Alias)
 	}
 
 	// Listen on a random port for gRPC.
 	var err error
 	ft.Listener, err = net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
-		t.Fatalf("Cannot listen: %v", err)
+		require("Cannot listen: %v", err)
 	}
 	gRPCPort := int32(ft.Listener.Addr().(*net.TCPAddr).Port)
 
@@ -184,7 +184,7 @@ func (ft *fakeTablet) StartActionLoop(t *testing.T, wr *Wrangler) {
 	if ft.StartHTTPServer {
 		ft.HTTPListener, err = net.Listen("tcp", "127.0.0.1:0")
 		if err != nil {
-			t.Fatalf("Cannot listen on http port: %v", err)
+			require("Cannot listen on http port: %v", err)
 		}
 		handler := http.NewServeMux()
 		ft.HTTPServer = &http.Server{
@@ -240,7 +240,7 @@ func (ft *fakeTablet) StartActionLoop(t *testing.T, wr *Wrangler) {
 // StopActionLoop will stop the Action Loop for the given FakeTablet
 func (ft *fakeTablet) StopActionLoop(t *testing.T) {
 	if ft.TM == nil {
-		t.Fatalf("TM for %v is not running", ft.Tablet.Alias)
+		require("TM for %v is not running", ft.Tablet.Alias)
 	}
 	if ft.StartHTTPServer {
 		ft.HTTPListener.Close()
