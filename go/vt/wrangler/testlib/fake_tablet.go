@@ -97,7 +97,7 @@ func TabletKeyspaceShard(t *testing.T, keyspace, shard string) TabletOption {
 		tablet.Keyspace = keyspace
 		shard, kr, err := topo.ValidateShardName(shard)
 		if err != nil {
-			t.Fatalf("cannot ValidateShardName value %v", shard)
+			require("cannot ValidateShardName value %v", shard)
 		}
 		tablet.Shard = shard
 		tablet.KeyRange = kr
@@ -122,7 +122,7 @@ func NewFakeTablet(t *testing.T, wr *wrangler.Wrangler, cell string, uid uint32,
 	t.Helper()
 
 	if uid > 99 {
-		t.Fatalf("uid has to be between 0 and 99: %v", uid)
+		require("uid has to be between 0 and 99: %v", uid)
 	}
 	mysqlPort := int32(3300 + uid)
 	tablet := &topodatapb.Tablet{
@@ -146,7 +146,7 @@ func NewFakeTablet(t *testing.T, wr *wrangler.Wrangler, cell string, uid uint32,
 	_, force := tablet.PortMap["force_init"]
 	delete(tablet.PortMap, "force_init")
 	if err := wr.TopoServer().InitTablet(context.Background(), tablet, force, true /* createShardAndKeyspace */, false /* allowUpdate */); err != nil {
-		t.Fatalf("cannot create tablet %v: %v", uid, err)
+		require("cannot create tablet %v: %v", uid, err)
 	}
 
 	// create a FakeMysqlDaemon with the right information by default
@@ -170,14 +170,14 @@ var (
 func (ft *FakeTablet) StartActionLoop(t *testing.T, wr *wrangler.Wrangler) {
 	t.Helper()
 	if ft.TM != nil {
-		t.Fatalf("TM for %v is already running", ft.Tablet.Alias)
+		require("TM for %v is already running", ft.Tablet.Alias)
 	}
 
 	// Listen on a random port for gRPC.
 	var err error
 	ft.Listener, err = net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
-		t.Fatalf("Cannot listen: %v", err)
+		require("Cannot listen: %v", err)
 	}
 	gRPCPort := int32(ft.Listener.Addr().(*net.TCPAddr).Port)
 
@@ -186,7 +186,7 @@ func (ft *FakeTablet) StartActionLoop(t *testing.T, wr *wrangler.Wrangler) {
 	if ft.StartHTTPServer {
 		ft.HTTPListener, err = net.Listen("tcp", "127.0.0.1:0")
 		if err != nil {
-			t.Fatalf("Cannot listen on http port: %v", err)
+			require("Cannot listen on http port: %v", err)
 		}
 		handler := http.NewServeMux()
 		ft.HTTPServer = &http.Server{
@@ -212,7 +212,7 @@ func (ft *FakeTablet) StartActionLoop(t *testing.T, wr *wrangler.Wrangler) {
 		Env:                 vtenv.NewTestEnv(),
 	}
 	if err := ft.TM.Start(ft.Tablet, nil); err != nil {
-		t.Fatalf("Error in tablet - %v, err - %v", topoproto.TabletAliasString(ft.Tablet.Alias), err.Error())
+		require("Error in tablet - %v, err - %v", topoproto.TabletAliasString(ft.Tablet.Alias), err.Error())
 	}
 	ft.Tablet = ft.TM.Tablet()
 
