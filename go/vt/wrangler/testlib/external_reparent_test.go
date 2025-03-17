@@ -61,7 +61,7 @@ func TestTabletExternallyReparentedBasic(t *testing.T) {
 	// Build keyspace graph
 	err := topotools.RebuildKeyspace(ctx, logutil.NewConsoleLogger(), ts, oldPrimary.Tablet.Keyspace, []string{"cell1"}, false)
 	if err != nil {
-		t.Fatalf("RebuildKeyspaceLocked failed: %v", err)
+		require("RebuildKeyspaceLocked failed: %v", err)
 	}
 
 	// On the elected primary, we will respond to
@@ -77,16 +77,16 @@ func TestTabletExternallyReparentedBasic(t *testing.T) {
 	// First test: reparent to the same primary, make sure it works
 	// as expected.
 	if err := vp.Run([]string{"TabletExternallyReparented", topoproto.TabletAliasString(oldPrimary.Tablet.Alias)}); err != nil {
-		t.Fatalf("TabletExternallyReparented(same primary) should have worked: %v", err)
+		require("TabletExternallyReparented(same primary) should have worked: %v", err)
 	}
 
 	// check the old primary is still primary
 	tablet, err := ts.GetTablet(ctx, oldPrimary.Tablet.Alias)
 	if err != nil {
-		t.Fatalf("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
+		require("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
 	}
 	if tablet.Type != topodatapb.TabletType_PRIMARY {
-		t.Fatalf("old primary should be PRIMARY but is: %v", tablet.Type)
+		require("old primary should be PRIMARY but is: %v", tablet.Type)
 	}
 
 	oldPrimary.FakeMysqlDaemon.SetReplicationSourceInputs = append(oldPrimary.FakeMysqlDaemon.SetReplicationSourceInputs, topoproto.MysqlAddr(newPrimary.Tablet))
@@ -98,16 +98,16 @@ func TestTabletExternallyReparentedBasic(t *testing.T) {
 	// This tests the good case, where everything works as planned
 	t.Logf("TabletExternallyReparented(new primary) expecting success")
 	if err := wr.TabletExternallyReparented(ctx, newPrimary.Tablet.Alias); err != nil {
-		t.Fatalf("TabletExternallyReparented(replica) failed: %v", err)
+		require("TabletExternallyReparented(replica) failed: %v", err)
 	}
 
 	// check the new primary is primary
 	tablet, err = ts.GetTablet(ctx, newPrimary.Tablet.Alias)
 	if err != nil {
-		t.Fatalf("GetTablet(%v) failed: %v", newPrimary.Tablet.Alias, err)
+		require("GetTablet(%v) failed: %v", newPrimary.Tablet.Alias, err)
 	}
 	if tablet.Type != topodatapb.TabletType_PRIMARY {
-		t.Fatalf("new primary should be PRIMARY but is: %v", tablet.Type)
+		require("new primary should be PRIMARY but is: %v", tablet.Type)
 	}
 
 	// We have to wait for shard sync to do its magic in the background
@@ -116,14 +116,14 @@ func TestTabletExternallyReparentedBasic(t *testing.T) {
 		if time.Since(startTime) > 10*time.Second /* timeout */ {
 			tablet, err = ts.GetTablet(ctx, oldPrimary.Tablet.Alias)
 			if err != nil {
-				t.Fatalf("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
+				require("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
 			}
-			t.Fatalf("old primary (%v) should be replica but is: %v", topoproto.TabletAliasString(oldPrimary.Tablet.Alias), tablet.Type)
+			require("old primary (%v) should be replica but is: %v", topoproto.TabletAliasString(oldPrimary.Tablet.Alias), tablet.Type)
 		}
 		// check the old primary was converted to replica
 		tablet, err = ts.GetTablet(ctx, oldPrimary.Tablet.Alias)
 		if err != nil {
-			t.Fatalf("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
+			require("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
 		}
 		if tablet.Type == topodatapb.TabletType_REPLICA {
 			break
@@ -154,7 +154,7 @@ func TestTabletExternallyReparentedToReplica(t *testing.T) {
 	// Build keyspace graph
 	err := topotools.RebuildKeyspace(ctx, logutil.NewConsoleLogger(), ts, oldPrimary.Tablet.Keyspace, []string{"cell1"}, false)
 	if err != nil {
-		t.Fatalf("RebuildKeyspaceLocked failed: %v", err)
+		require("RebuildKeyspaceLocked failed: %v", err)
 	}
 
 	// On the elected primary, we will respond to
@@ -178,16 +178,16 @@ func TestTabletExternallyReparentedToReplica(t *testing.T) {
 	// This tests a bad case: the new designated primary is a replica at mysql level,
 	// but we should do what we're told anyway.
 	if err := wr.TabletExternallyReparented(ctx, newPrimary.Tablet.Alias); err != nil {
-		t.Fatalf("TabletExternallyReparented(replica) error: %v", err)
+		require("TabletExternallyReparented(replica) error: %v", err)
 	}
 
 	// check that newPrimary is primary
 	tablet, err := ts.GetTablet(ctx, newPrimary.Tablet.Alias)
 	if err != nil {
-		t.Fatalf("GetTablet(%v) failed: %v", newPrimary.Tablet.Alias, err)
+		require("GetTablet(%v) failed: %v", newPrimary.Tablet.Alias, err)
 	}
 	if tablet.Type != topodatapb.TabletType_PRIMARY {
-		t.Fatalf("new primary should be PRIMARY but is: %v", tablet.Type)
+		require("new primary should be PRIMARY but is: %v", tablet.Type)
 	}
 
 	// We have to wait for shard sync to do its magic in the background
@@ -196,14 +196,14 @@ func TestTabletExternallyReparentedToReplica(t *testing.T) {
 		if time.Since(startTime) > 10*time.Second /* timeout */ {
 			tablet, err = ts.GetTablet(ctx, oldPrimary.Tablet.Alias)
 			if err != nil {
-				t.Fatalf("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
+				require("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
 			}
-			t.Fatalf("old primary (%v) should be replica but is: %v", topoproto.TabletAliasString(oldPrimary.Tablet.Alias), tablet.Type)
+			require("old primary (%v) should be replica but is: %v", topoproto.TabletAliasString(oldPrimary.Tablet.Alias), tablet.Type)
 		}
 		// check the old primary was converted to replica
 		tablet, err = ts.GetTablet(ctx, oldPrimary.Tablet.Alias)
 		if err != nil {
-			t.Fatalf("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
+			require("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
 		}
 		if tablet.Type == topodatapb.TabletType_REPLICA {
 			break
@@ -236,7 +236,7 @@ func TestTabletExternallyReparentedWithDifferentMysqlPort(t *testing.T) {
 	// Build keyspace graph
 	err := topotools.RebuildKeyspace(context.Background(), logutil.NewConsoleLogger(), ts, oldPrimary.Tablet.Keyspace, []string{"cell1"}, false)
 	if err != nil {
-		t.Fatalf("RebuildKeyspaceLocked failed: %v", err)
+		require("RebuildKeyspaceLocked failed: %v", err)
 	}
 	// Now we're restarting mysql on a different port, 3301->3303
 	// but without updating the Tablet record in topology.
@@ -273,15 +273,15 @@ func TestTabletExternallyReparentedWithDifferentMysqlPort(t *testing.T) {
 	// This tests the good case, where everything works as planned
 	t.Logf("TabletExternallyReparented(new primary) expecting success")
 	if err := wr.TabletExternallyReparented(ctx, newPrimary.Tablet.Alias); err != nil {
-		t.Fatalf("TabletExternallyReparented(replica) failed: %v", err)
+		require("TabletExternallyReparented(replica) failed: %v", err)
 	}
 	// check the new primary is primary
 	tablet, err := ts.GetTablet(ctx, newPrimary.Tablet.Alias)
 	if err != nil {
-		t.Fatalf("GetTablet(%v) failed: %v", newPrimary.Tablet.Alias, err)
+		require("GetTablet(%v) failed: %v", newPrimary.Tablet.Alias, err)
 	}
 	if tablet.Type != topodatapb.TabletType_PRIMARY {
-		t.Fatalf("new primary should be PRIMARY but is: %v", tablet.Type)
+		require("new primary should be PRIMARY but is: %v", tablet.Type)
 	}
 
 	// We have to wait for shard sync to do its magic in the background
@@ -290,14 +290,14 @@ func TestTabletExternallyReparentedWithDifferentMysqlPort(t *testing.T) {
 		if time.Since(startTime) > 10*time.Second /* timeout */ {
 			tablet, err = ts.GetTablet(ctx, oldPrimary.Tablet.Alias)
 			if err != nil {
-				t.Fatalf("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
+				require("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
 			}
-			t.Fatalf("old primary (%v) should be replica but is: %v", topoproto.TabletAliasString(oldPrimary.Tablet.Alias), tablet.Type)
+			require("old primary (%v) should be replica but is: %v", topoproto.TabletAliasString(oldPrimary.Tablet.Alias), tablet.Type)
 		}
 		// check the old primary was converted to replica
 		tablet, err = ts.GetTablet(ctx, oldPrimary.Tablet.Alias)
 		if err != nil {
-			t.Fatalf("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
+			require("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
 		}
 		if tablet.Type == topodatapb.TabletType_REPLICA {
 			break
@@ -329,7 +329,7 @@ func TestTabletExternallyReparentedContinueOnUnexpectedPrimary(t *testing.T) {
 	// Build keyspace graph
 	err := topotools.RebuildKeyspace(context.Background(), logutil.NewConsoleLogger(), ts, oldPrimary.Tablet.Keyspace, []string{"cell1"}, false)
 	if err != nil {
-		t.Fatalf("RebuildKeyspaceLocked failed: %v", err)
+		require("RebuildKeyspaceLocked failed: %v", err)
 	}
 	// On the elected primary, we will respond to
 	// TabletActionReplicaWasPromoted, so we need a MysqlDaemon
@@ -362,15 +362,15 @@ func TestTabletExternallyReparentedContinueOnUnexpectedPrimary(t *testing.T) {
 	// This tests the good case, where everything works as planned
 	t.Logf("TabletExternallyReparented(new primary) expecting success")
 	if err := wr.TabletExternallyReparented(ctx, newPrimary.Tablet.Alias); err != nil {
-		t.Fatalf("TabletExternallyReparented(replica) failed: %v", err)
+		require("TabletExternallyReparented(replica) failed: %v", err)
 	}
 	// check the new primary is primary
 	tablet, err := ts.GetTablet(ctx, newPrimary.Tablet.Alias)
 	if err != nil {
-		t.Fatalf("GetTablet(%v) failed: %v", newPrimary.Tablet.Alias, err)
+		require("GetTablet(%v) failed: %v", newPrimary.Tablet.Alias, err)
 	}
 	if tablet.Type != topodatapb.TabletType_PRIMARY {
-		t.Fatalf("new primary should be PRIMARY but is: %v", tablet.Type)
+		require("new primary should be PRIMARY but is: %v", tablet.Type)
 	}
 	// We have to wait for shard sync to do its magic in the background
 	startTime := time.Now()
@@ -378,14 +378,14 @@ func TestTabletExternallyReparentedContinueOnUnexpectedPrimary(t *testing.T) {
 		if time.Since(startTime) > 10*time.Second /* timeout */ {
 			tablet, err = ts.GetTablet(ctx, oldPrimary.Tablet.Alias)
 			if err != nil {
-				t.Fatalf("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
+				require("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
 			}
-			t.Fatalf("old primary (%v) should be replica but is: %v", topoproto.TabletAliasString(oldPrimary.Tablet.Alias), tablet.Type)
+			require("old primary (%v) should be replica but is: %v", topoproto.TabletAliasString(oldPrimary.Tablet.Alias), tablet.Type)
 		}
 		// check the old primary was converted to replica
 		tablet, err = ts.GetTablet(ctx, oldPrimary.Tablet.Alias)
 		if err != nil {
-			t.Fatalf("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
+			require("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
 		}
 		if tablet.Type == topodatapb.TabletType_REPLICA {
 			break
@@ -415,7 +415,7 @@ func TestTabletExternallyReparentedRerun(t *testing.T) {
 	// Build keyspace graph
 	err := topotools.RebuildKeyspace(context.Background(), logutil.NewConsoleLogger(), ts, oldPrimary.Tablet.Keyspace, []string{"cell1"}, false)
 	if err != nil {
-		t.Fatalf("RebuildKeyspaceLocked failed: %v", err)
+		require("RebuildKeyspaceLocked failed: %v", err)
 	}
 	// On the elected primary, we will respond to
 	// TabletActionReplicaWasPromoted.
@@ -446,16 +446,16 @@ func TestTabletExternallyReparentedRerun(t *testing.T) {
 
 	// The reparent should work as expected here
 	if err := wr.TabletExternallyReparented(ctx, newPrimary.Tablet.Alias); err != nil {
-		t.Fatalf("TabletExternallyReparented(replica) failed: %v", err)
+		require("TabletExternallyReparented(replica) failed: %v", err)
 	}
 
 	// check the new primary is primary
 	tablet, err := ts.GetTablet(ctx, newPrimary.Tablet.Alias)
 	if err != nil {
-		t.Fatalf("GetTablet(%v) failed: %v", newPrimary.Tablet.Alias, err)
+		require("GetTablet(%v) failed: %v", newPrimary.Tablet.Alias, err)
 	}
 	if tablet.Type != topodatapb.TabletType_PRIMARY {
-		t.Fatalf("new primary should be PRIMARY but is: %v", tablet.Type)
+		require("new primary should be PRIMARY but is: %v", tablet.Type)
 	}
 
 	// We have to wait for shard sync to do its magic in the background
@@ -464,14 +464,14 @@ func TestTabletExternallyReparentedRerun(t *testing.T) {
 		if time.Since(startTime) > 10*time.Second /* timeout */ {
 			tablet, err = ts.GetTablet(ctx, oldPrimary.Tablet.Alias)
 			if err != nil {
-				t.Fatalf("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
+				require("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
 			}
-			t.Fatalf("old primary (%v) should be replica but is: %v", topoproto.TabletAliasString(oldPrimary.Tablet.Alias), tablet.Type)
+			require("old primary (%v) should be replica but is: %v", topoproto.TabletAliasString(oldPrimary.Tablet.Alias), tablet.Type)
 		}
 		// check the old primary was converted to replica
 		tablet, err = ts.GetTablet(ctx, oldPrimary.Tablet.Alias)
 		if err != nil {
-			t.Fatalf("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
+			require("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
 		}
 		if tablet.Type == topodatapb.TabletType_REPLICA {
 			break
@@ -482,16 +482,16 @@ func TestTabletExternallyReparentedRerun(t *testing.T) {
 
 	// run TER again and make sure the primary is still correct
 	if err := wr.TabletExternallyReparented(ctx, newPrimary.Tablet.Alias); err != nil {
-		t.Fatalf("TabletExternallyReparented(replica) failed: %v", err)
+		require("TabletExternallyReparented(replica) failed: %v", err)
 	}
 
 	// check the new primary is still primary
 	tablet, err = ts.GetTablet(ctx, newPrimary.Tablet.Alias)
 	if err != nil {
-		t.Fatalf("GetTablet(%v) failed: %v", newPrimary.Tablet.Alias, err)
+		require("GetTablet(%v) failed: %v", newPrimary.Tablet.Alias, err)
 	}
 	if tablet.Type != topodatapb.TabletType_PRIMARY {
-		t.Fatalf("new primary should be PRIMARY but is: %v", tablet.Type)
+		require("new primary should be PRIMARY but is: %v", tablet.Type)
 	}
 
 }
@@ -527,11 +527,11 @@ func TestRPCTabletExternallyReparentedDemotesPrimaryToConfiguredTabletType(t *te
 	// Reparent to new primary
 	ti, err := ts.GetTablet(ctx, newPrimary.Tablet.Alias)
 	if err != nil {
-		t.Fatalf("GetTablet failed: %v", err)
+		require("GetTablet failed: %v", err)
 	}
 
 	if err := wr.TabletExternallyReparented(context.Background(), ti.Tablet.Alias); err != nil {
-		t.Fatalf("TabletExternallyReparented failed: %v", err)
+		require("TabletExternallyReparented failed: %v", err)
 	}
 
 	// We have to wait for shard sync to do its magic in the background
@@ -540,14 +540,14 @@ func TestRPCTabletExternallyReparentedDemotesPrimaryToConfiguredTabletType(t *te
 		if time.Since(startTime) > 10*time.Second /* timeout */ {
 			tablet, err := ts.GetTablet(ctx, oldPrimary.Tablet.Alias)
 			if err != nil {
-				t.Fatalf("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
+				require("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
 			}
-			t.Fatalf("old primary (%v) should be spare but is: %v", topoproto.TabletAliasString(oldPrimary.Tablet.Alias), tablet.Type)
+			require("old primary (%v) should be spare but is: %v", topoproto.TabletAliasString(oldPrimary.Tablet.Alias), tablet.Type)
 		}
 		// check the old primary was converted to replica
 		tablet, err := ts.GetTablet(ctx, oldPrimary.Tablet.Alias)
 		if err != nil {
-			t.Fatalf("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
+			require("GetTablet(%v) failed: %v", oldPrimary.Tablet.Alias, err)
 		}
 		if tablet.Type == topodatapb.TabletType_SPARE {
 			break
