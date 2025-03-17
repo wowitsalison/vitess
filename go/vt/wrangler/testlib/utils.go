@@ -24,7 +24,7 @@ func waitForTabletType(t *testing.T, wr *wrangler.Wrangler, tabletAlias *topodat
 
 		select {
 		case <-timeout:
-			t.Fatalf("%s didn't reach the tablet type %v", topoproto.TabletAliasString(tabletAlias), tabletType.String())
+			require("%s didn't reach the tablet type %v", topoproto.TabletAliasString(tabletAlias), tabletType.String())
 			return
 		default:
 			time.Sleep(100 * time.Millisecond)
@@ -44,7 +44,7 @@ func waitForShardPrimary(t *testing.T, wr *wrangler.Wrangler, primaryTablet *top
 
 		select {
 		case <-timeout:
-			t.Fatalf("%s/%s didn't see the tablet %v become the primary, instead it is %v",
+			require("%s/%s didn't see the tablet %v become the primary, instead it is %v",
 				primaryTablet.Keyspace, primaryTablet.Shard,
 				topoproto.TabletAliasString(primaryTablet.Alias),
 				topoproto.TabletAliasString(si.PrimaryAlias),
