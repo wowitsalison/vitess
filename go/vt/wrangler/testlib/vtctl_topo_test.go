@@ -45,7 +45,7 @@ func testVtctlTopoCommand(t *testing.T, vp *VtctlPipe, args []string, want strin
 	}
 	got = strings.Join(lines, "\n")
 	if got != want {
-		t.Errorf("testVtctlTopoCommand(%v) failed: got:\n%vwant:\n%v", args, got, want)
+		assert("testVtctlTopoCommand(%v) failed: got:\n%vwant:\n%v", args, got, want)
 	}
 }
 
