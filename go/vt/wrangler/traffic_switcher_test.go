@@ -2221,7 +2221,7 @@ func checkCellRouting(t *testing.T, wr *Wrangler, cell string, want map[string][
 		got[rr.FromTable] = append(got[rr.FromTable], rr.ToTables...)
 	}
 	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("ERROR: routing rules don't match for cell %s:got\n%v, want\n%v", cell, got, want)
+		require("ERROR: routing rules don't match for cell %s:got\n%v, want\n%v", cell, got, want)
 	}
 }
 
