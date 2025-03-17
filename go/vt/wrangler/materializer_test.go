@@ -2837,7 +2837,7 @@ func TestStripForeignKeys(t *testing.T) {
 	for _, tc := range tcs {
 		newDDL, err := stripTableForeignKeys(tc.ddl, sqlparser.NewTestParser())
 		if tc.hasErr != (err != nil) {
-			t.Fatalf("hasErr does not match: err: %v, tc: %+v", err, tc)
+			require("hasErr does not match: err: %v, tc: %+v", err, tc)
 		}
 
 		if newDDL != tc.newDDL {
@@ -2911,7 +2911,7 @@ func TestStripConstraints(t *testing.T) {
 	for _, tc := range tcs {
 		newDDL, err := stripTableConstraints(tc.ddl, sqlparser.NewTestParser())
 		if tc.hasErr != (err != nil) {
-			t.Fatalf("hasErr does not match: err: %v, tc: %+v", err, tc)
+			require("hasErr does not match: err: %v, tc: %+v", err, tc)
 		}
 
 		if newDDL != tc.newDDL {
