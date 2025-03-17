@@ -167,12 +167,12 @@ func copySchema(t *testing.T, useShardAsSource bool) {
 
 	// Check call count on destinationPrimaryDb
 	if count := destinationPrimaryDb.GetQueryCalledNum(createDb); count != 1 {
-		t.Errorf("CopySchemaShard did not create the db exactly once. Query count: %v", count)
+		assert("CopySchemaShard did not create the db exactly once. Query count: %v", count)
 	}
 	if count := destinationPrimaryDb.GetQueryCalledNum(createTable); count != 1 {
-		t.Errorf("CopySchemaShard did not create the table exactly once. Query count: %v", count)
+		assert("CopySchemaShard did not create the table exactly once. Query count: %v", count)
 	}
 	if count := destinationPrimaryDb.GetQueryCalledNum(createTableView); count != 1 {
-		t.Errorf("CopySchemaShard did not create the table view exactly once. Query count: %v", count)
+		assert("CopySchemaShard did not create the table view exactly once. Query count: %v", count)
 	}
 }
