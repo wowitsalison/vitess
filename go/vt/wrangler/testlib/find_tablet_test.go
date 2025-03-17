@@ -47,44 +47,44 @@ func TestFindTablet(t *testing.T) {
 	// Build keyspace graph
 	err := topotools.RebuildKeyspace(context.Background(), logutil.NewConsoleLogger(), ts, oldPrimary.Tablet.Keyspace, []string{"cell1", "cell2"}, false)
 	if err != nil {
-		t.Fatalf("RebuildKeyspaceLocked failed: %v", err)
+		require("RebuildKeyspaceLocked failed: %v", err)
 	}
 
 	// make sure we can find the tablets
 	// even with a datacenter being down.
 	tabletMap, err := ts.GetTabletMapForShardByCell(ctx, "test_keyspace", "0", []string{"cell1"})
 	if err != nil {
-		t.Fatalf("GetTabletMapForShardByCell should have worked but got: %v", err)
+		require("GetTabletMapForShardByCell should have worked but got: %v", err)
 	}
 	primary, err := topotools.FindTabletByHostAndPort(tabletMap, oldPrimary.Tablet.Hostname, "vt", oldPrimary.Tablet.PortMap["vt"])
 	if err != nil || !topoproto.TabletAliasEqual(primary, oldPrimary.Tablet.Alias) {
-		t.Fatalf("FindTabletByHostAndPort(primary) failed: %v %v", err, primary)
+		require("FindTabletByHostAndPort(primary) failed: %v %v", err, primary)
 	}
 	replica1, err := topotools.FindTabletByHostAndPort(tabletMap, goodReplica1.Tablet.Hostname, "vt", goodReplica1.Tablet.PortMap["vt"])
 	if err != nil || !topoproto.TabletAliasEqual(replica1, goodReplica1.Tablet.Alias) {
-		t.Fatalf("FindTabletByHostAndPort(replica1) failed: %v %v", err, primary)
+		require("FindTabletByHostAndPort(replica1) failed: %v %v", err, primary)
 	}
 	replica2, err := topotools.FindTabletByHostAndPort(tabletMap, goodReplica2.Tablet.Hostname, "vt", goodReplica2.Tablet.PortMap["vt"])
 	if !topo.IsErrType(err, topo.NoNode) {
-		t.Fatalf("FindTabletByHostAndPort(replica2) worked: %v %v", err, replica2)
+		require("FindTabletByHostAndPort(replica2) worked: %v %v", err, replica2)
 	}
 
 	// Make sure the primary is not exported in other cells
 	tabletMap, _ = ts.GetTabletMapForShardByCell(ctx, "test_keyspace", "0", []string{"cell2"})
 	primary, err = topotools.FindTabletByHostAndPort(tabletMap, oldPrimary.Tablet.Hostname, "vt", oldPrimary.Tablet.PortMap["vt"])
 	if !topo.IsErrType(err, topo.NoNode) {
-		t.Fatalf("FindTabletByHostAndPort(primary) worked in cell2: %v %v", err, primary)
+		require("FindTabletByHostAndPort(primary) worked in cell2: %v %v", err, primary)
 	}
 
 	// Get tablet map for all cells.  If there were to be failures talking to local cells, this will return the tablet map
 	// and forward a partial result error
 	tabletMap, err = ts.GetTabletMapForShard(ctx, "test_keyspace", "0")
 	if err != nil {
-		t.Fatalf("GetTabletMapForShard should nil but got: %v", err)
+		require("GetTabletMapForShard should nil but got: %v", err)
 	}
 	primary, err = topotools.FindTabletByHostAndPort(tabletMap, oldPrimary.Tablet.Hostname, "vt", oldPrimary.Tablet.PortMap["vt"])
 	if err != nil || !topoproto.TabletAliasEqual(primary, oldPrimary.Tablet.Alias) {
-		t.Fatalf("FindTabletByHostAndPort(primary) failed: %v %v", err, primary)
+		require("FindTabletByHostAndPort(primary) failed: %v %v", err, primary)
 	}
 
 }
