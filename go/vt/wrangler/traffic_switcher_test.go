@@ -281,7 +281,7 @@ func TestTableMigrateMainflow(t *testing.T) {
 	_, err = tme.wr.SwitchReads(ctx, tme.targetKeyspace, "test", []topodatapb.TabletType{topodatapb.TabletType_PRIMARY}, nil, workflow.DirectionForward, false)
 	want := "invalid tablet type: tablet type must be REPLICA or RDONLY: PRIMARY"
 	if err == nil || err.Error() != want {
-		t.Errorf("SwitchReads(primary) err: %v, want %v", err, want)
+		assert("SwitchReads(primary) err: %v, want %v", err, want)
 	}
 	verifyQueries(t, tme.allDBClients)
 
@@ -352,7 +352,7 @@ func TestTableMigrateMainflow(t *testing.T) {
 	_, _, err = tme.wr.SwitchWrites(ctx, tme.targetKeyspace, "test", 0*time.Second, false, false, true, false, true)
 	want = "DeadlineExceeded"
 	if err == nil || !strings.Contains(err.Error(), want) {
-		t.Errorf("SwitchWrites(0 timeout) err: %v, must contain %v", err, want)
+		assert("SwitchWrites(0 timeout) err: %v, must contain %v", err, want)
 	}
 	verifyQueries(t, tme.allDBClients)
 	checkRouting(t, tme.wr, map[string][]string{
@@ -462,7 +462,7 @@ func TestTableMigrateMainflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	if journalID != 7672494164556733923 {
-		t.Errorf("journal id: %d, want 7672494164556733923", journalID)
+		assert("journal id: %d, want 7672494164556733923", journalID)
 	}
 
 	checkRouting(t, tme.wr, map[string][]string{
@@ -602,7 +602,7 @@ func TestShardMigrateMainflow(t *testing.T) {
 	_, err = tme.wr.SwitchReads(ctx, tme.targetKeyspace, "test", []topodatapb.TabletType{topodatapb.TabletType_PRIMARY}, nil, workflow.DirectionForward, false)
 	want := "invalid tablet type: tablet type must be REPLICA or RDONLY: PRIMARY"
 	if err == nil || err.Error() != want {
-		t.Errorf("SwitchReads(primary) err: %v, want %v", err, want)
+		assert("SwitchReads(primary) err: %v, want %v", err, want)
 	}
 	verifyQueries(t, tme.allDBClients)
 
@@ -667,7 +667,7 @@ func TestShardMigrateMainflow(t *testing.T) {
 	_, _, err = tme.wr.SwitchWrites(ctx, tme.targetKeyspace, "test", 0*time.Second, false, false, true, false, true)
 	want = "DeadlineExceeded"
 	if err == nil || !strings.Contains(err.Error(), want) {
-		t.Errorf("SwitchWrites(0 timeout) err: %v, must contain %v", err, want)
+		assert("SwitchWrites(0 timeout) err: %v, must contain %v", err, want)
 	}
 
 	verifyQueries(t, tme.allDBClients)
@@ -758,7 +758,7 @@ func TestShardMigrateMainflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	if journalID != 6432976123657117097 {
-		t.Errorf("journal id: %d, want 6432976123657117097", journalID)
+		assert("journal id: %d, want 6432976123657117097", journalID)
 	}
 
 	verifyQueries(t, tme.allDBClients)
@@ -1196,18 +1196,18 @@ func TestMigrateFailJournal(t *testing.T) {
 	_, _, err = tme.wr.SwitchWrites(ctx, tme.targetKeyspace, "test", 1*time.Second, false, false, true, false, true)
 	want := "journaling intentionally failed"
 	if err == nil || !strings.Contains(err.Error(), want) {
-		t.Errorf("SwitchWrites(0 timeout) err: %v, must contain %v", err, want)
+		assert("SwitchWrites(0 timeout) err: %v, must contain %v", err, want)
 	}
 
 	// Verify that cancel didn't happen.
 	if tme.dbTargetClients[0].queries[cancel1].exhausted() {
-		t.Errorf("tme.dbTargetClients[0].queries[cancel1].exhausted: %v, want false", tme.dbTargetClients[0].queries[cancel1])
+		assert("tme.dbTargetClients[0].queries[cancel1].exhausted: %v, want false", tme.dbTargetClients[0].queries[cancel1])
 	}
 	if tme.dbTargetClients[1].queries[cancel1].exhausted() {
-		t.Errorf("tme.dbTargetClients[0].queries[cancel1].exhausted: %v, want false", tme.dbTargetClients[0].queries[cancel1])
+		assert("tme.dbTargetClients[0].queries[cancel1].exhausted: %v, want false", tme.dbTargetClients[0].queries[cancel1])
 	}
 	if tme.dbTargetClients[0].queries[cancel2].exhausted() {
-		t.Errorf("tme.dbTargetClients[0].queries[cancel1].exhausted: %v, want false", tme.dbTargetClients[0].queries[cancel1])
+		assert("tme.dbTargetClients[0].queries[cancel1].exhausted: %v, want false", tme.dbTargetClients[0].queries[cancel1])
 	}
 }
 
@@ -1622,7 +1622,7 @@ func TestMigrateNoStreamsFound(t *testing.T) {
 	_, err := tme.wr.SwitchReads(ctx, tme.targetKeyspace, "test", []topodatapb.TabletType{topodatapb.TabletType_RDONLY}, nil, workflow.DirectionForward, false)
 	want := "workflow test not found in keyspace ks2"
 	if err == nil || !strings.Contains(err.Error(), want) {
-		t.Errorf("SwitchReads: %v, must contain %v", err, want)
+		assert("SwitchReads: %v, must contain %v", err, want)
 	}
 }
 
@@ -1654,7 +1654,7 @@ func TestMigrateDistinctSources(t *testing.T) {
 	_, err := tme.wr.SwitchReads(ctx, tme.targetKeyspace, "test", []topodatapb.TabletType{topodatapb.TabletType_RDONLY}, nil, workflow.DirectionForward, false)
 	want := "source keyspaces are mismatched across streams"
 	if err == nil || !strings.Contains(err.Error(), want) {
-		t.Errorf("SwitchReads: %v, must contain %v", err, want)
+		assert("SwitchReads: %v, must contain %v", err, want)
 	}
 }
 
@@ -1684,7 +1684,7 @@ func TestMigrateMismatchedTables(t *testing.T) {
 	_, err := tme.wr.SwitchReads(ctx, tme.targetKeyspace, "test", []topodatapb.TabletType{topodatapb.TabletType_RDONLY}, nil, workflow.DirectionForward, false)
 	want := "table lists are mismatched across streams"
 	if err == nil || !strings.Contains(err.Error(), want) {
-		t.Errorf("SwitchReads: %v, must contain %v", err, want)
+		assert("SwitchReads: %v, must contain %v", err, want)
 	}
 }
 
@@ -1699,7 +1699,7 @@ func TestTableMigrateAllShardsNotPresent(t *testing.T) {
 	_, err := tme.wr.SwitchReads(ctx, tme.targetKeyspace, "test", []topodatapb.TabletType{topodatapb.TabletType_RDONLY}, nil, workflow.DirectionForward, false)
 	want := "mismatched shards for keyspace"
 	if err == nil || !strings.Contains(err.Error(), want) {
-		t.Errorf("SwitchReads: %v, must contain %v", err, want)
+		assert("SwitchReads: %v, must contain %v", err, want)
 	}
 }
 
@@ -1757,7 +1757,7 @@ func TestMigrateNoTableWildcards(t *testing.T) {
 	_, err := tme.wr.SwitchReads(ctx, tme.targetKeyspace, "test", []topodatapb.TabletType{topodatapb.TabletType_RDONLY}, nil, workflow.DirectionForward, false)
 	want := "cannot migrate streams with wild card table names: /.*"
 	if err == nil || !strings.Contains(err.Error(), want) {
-		t.Errorf("SwitchReads: %v, must contain %v", err, want)
+		assert("SwitchReads: %v, must contain %v", err, want)
 	}
 }
 
@@ -1915,7 +1915,7 @@ func TestShardMigrateNoAvailableTabletsForReverseReplication(t *testing.T) {
 	_, err = tme.wr.SwitchReads(ctx, tme.targetKeyspace, "test", []topodatapb.TabletType{topodatapb.TabletType_PRIMARY}, nil, workflow.DirectionForward, false)
 	want := "invalid tablet type: tablet type must be REPLICA or RDONLY: PRIMARY"
 	if err == nil || err.Error() != want {
-		t.Errorf("SwitchReads(primary) err: %v, want %v", err, want)
+		assert("SwitchReads(primary) err: %v, want %v", err, want)
 	}
 	verifyQueries(t, tme.allDBClients)
 
@@ -1981,7 +1981,7 @@ func TestShardMigrateNoAvailableTabletsForReverseReplication(t *testing.T) {
 	_, _, err = tme.wr.SwitchWrites(ctx, tme.targetKeyspace, "test", 0*time.Second, false, false, true, false, true)
 	want = "DeadlineExceeded"
 	if err == nil || !strings.Contains(err.Error(), want) {
-		t.Errorf("SwitchWrites(0 timeout) err: %v, must contain %v", err, want)
+		assert("SwitchWrites(0 timeout) err: %v, must contain %v", err, want)
 	}
 
 	verifyQueries(t, tme.allDBClients)
@@ -2088,7 +2088,7 @@ func TestShardMigrateNoAvailableTabletsForReverseReplication(t *testing.T) {
 		t.Fatal(err)
 	}
 	if journalID != 6432976123657117097 {
-		t.Errorf("journal id: %d, want 6432976123657117097", journalID)
+		assert("journal id: %d, want 6432976123657117097", journalID)
 	}
 
 	verifyQueries(t, tme.allDBClients)
@@ -2198,7 +2198,7 @@ func checkRouting(t *testing.T, wr *Wrangler, want map[string][]string) {
 		t.Fatal(err)
 	}
 	if !reflect.DeepEqual(got, want) {
-		t.Errorf("rules:\n%v, want\n%v", got, want)
+		assert("rules:\n%v, want\n%v", got, want)
 	}
 	cells, err := wr.ts.GetCellInfoNames(ctx)
 	if err != nil {
@@ -2239,7 +2239,7 @@ func checkDenyList(t *testing.T, ts *topo.Server, keyspaceShard string, want []s
 		got = tc.DeniedTables
 	}
 	if !reflect.DeepEqual(got, want) {
-		t.Errorf("Denied tables for %v: %v, want %v", keyspaceShard, got, want)
+		assert("Denied tables for %v: %v, want %v", keyspaceShard, got, want)
 	}
 }
 
@@ -2291,7 +2291,7 @@ func checkIfPrimaryServing(t *testing.T, ts *topo.Server, keyspaceShard string, 
 		t.Fatal(err)
 	}
 	if want != si.IsPrimaryServing {
-		t.Errorf("IsPrimaryServing(%v): %v, want %v", keyspaceShard, si.IsPrimaryServing, want)
+		assert("IsPrimaryServing(%v): %v, want %v", keyspaceShard, si.IsPrimaryServing, want)
 	}
 }
 
