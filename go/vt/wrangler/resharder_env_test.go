@@ -247,7 +247,7 @@ func (tmc *testResharderTMClient) verifyQueries(t *testing.T) {
 			for _, qr := range qrs {
 				list = append(list, qr.query)
 			}
-			t.Errorf("tablet %v: following queries were not run during the test: \n%v", tabletID, strings.Join(list, "\n"))
+			assert("tablet %v: following queries were not run during the test: \n%v", tabletID, strings.Join(list, "\n"))
 		}
 	}
 }
