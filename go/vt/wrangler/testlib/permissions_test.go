@@ -61,7 +61,7 @@ func TestPermissions(t *testing.T) {
 		return nil
 	})
 	if err != nil {
-		t.Fatalf("UpdateShardFields failed: %v", err)
+		require("UpdateShardFields failed: %v", err)
 	}
 
 	// primary will be asked for permissions
@@ -581,7 +581,7 @@ func TestPermissions(t *testing.T) {
 
 	// run ValidatePermissionsKeyspace, this should work
 	if err := vp.Run([]string{"ValidatePermissionsKeyspace", primary.Tablet.Keyspace}); err != nil {
-		t.Fatalf("ValidatePermissionsKeyspace failed: %v", err)
+		require("ValidatePermissionsKeyspace failed: %v", err)
 	}
 
 	// modify one field, this should fail
@@ -592,7 +592,7 @@ func TestPermissions(t *testing.T) {
 
 	// run ValidatePermissionsKeyspace again, this should now fail
 	if err := vp.Run([]string{"ValidatePermissionsKeyspace", primary.Tablet.Keyspace}); err == nil || !strings.Contains(err.Error(), "has an extra user") {
-		t.Fatalf("ValidatePermissionsKeyspace has unexpected err: %v", err)
+		require("ValidatePermissionsKeyspace has unexpected err: %v", err)
 	}
 
 }
