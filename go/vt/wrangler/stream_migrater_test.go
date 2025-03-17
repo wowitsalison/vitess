@@ -944,7 +944,7 @@ func TestStreamMigrateSyncFail(t *testing.T) {
 	_, _, err = tme.wr.SwitchWrites(ctx, tme.targetKeyspace, "test", 1*time.Second, false, false, true, false, false)
 	want := "does not match"
 	if err == nil || !strings.Contains(err.Error(), want) {
-		t.Errorf("SwitchWrites err: %v, want %s", err, want)
+		assert("SwitchWrites err: %v, want %s", err, want)
 	}
 	verifyQueries(t, tme.allDBClients)
 }
@@ -1040,7 +1040,7 @@ func TestStreamMigrateCancel(t *testing.T) {
 	_, _, err = tme.wr.SwitchWrites(ctx, tme.targetKeyspace, "test", 1*time.Second, false, false, true, false, false)
 	want := "intentionally failed"
 	if err == nil || !strings.Contains(err.Error(), want) {
-		t.Errorf("SwitchWrites err: %v, want %s", err, want)
+		assert("SwitchWrites err: %v, want %s", err, want)
 	}
 
 	checkServedTypes(t, tme.ts, "ks:-40", 1)
@@ -1110,7 +1110,7 @@ func TestStreamMigrateStoppedStreams(t *testing.T) {
 	_, _, err = tme.wr.SwitchWrites(ctx, tme.targetKeyspace, "test", 1*time.Second, false, false, true, false, false)
 	want := "failed to migrate the workflow streams: cannot migrate until all streams are running: 0: 10"
 	if err == nil || err.Error() != want {
-		t.Errorf("SwitchWrites err: %v, want %v", err, want)
+		assert("SwitchWrites err: %v, want %v", err, want)
 	}
 	verifyQueries(t, tme.allDBClients)
 }
@@ -1240,7 +1240,7 @@ func TestStreamMigrateStillCopying(t *testing.T) {
 	_, _, err = tme.wr.SwitchWrites(ctx, tme.targetKeyspace, "test", 1*time.Second, false, false, true, false, false)
 	want := "failed to migrate the workflow streams: cannot migrate while vreplication streams in source shards are still copying: 0"
 	if err == nil || err.Error() != want {
-		t.Errorf("SwitchWrites err: %v, want %v", err, want)
+		assert("SwitchWrites err: %v, want %v", err, want)
 	}
 	verifyQueries(t, tme.allDBClients)
 }
@@ -1302,7 +1302,7 @@ func TestStreamMigrateEmptyWorkflow(t *testing.T) {
 	_, _, err = tme.wr.SwitchWrites(ctx, tme.targetKeyspace, "test", 1*time.Second, false, false, true, false, false)
 	want := "failed to migrate the workflow streams: VReplication streams must have named workflows for migration: shard: ks:0, stream: 1"
 	if err == nil || err.Error() != want {
-		t.Errorf("SwitchWrites err: %v, want %v", err, want)
+		assert("SwitchWrites err: %v, want %v", err, want)
 	}
 	verifyQueries(t, tme.allDBClients)
 }
@@ -1364,7 +1364,7 @@ func TestStreamMigrateDupWorkflow(t *testing.T) {
 	_, _, err = tme.wr.SwitchWrites(ctx, tme.targetKeyspace, "test", 1*time.Second, false, false, true, false, false)
 	want := "failed to migrate the workflow streams: VReplication stream has the same workflow name as the resharding workflow: shard: ks:0, stream: 1"
 	if err == nil || err.Error() != want {
-		t.Errorf("SwitchWrites err: %v, want %v", err, want)
+		assert("SwitchWrites err: %v, want %v", err, want)
 	}
 	verifyQueries(t, tme.allDBClients)
 }
@@ -1437,7 +1437,7 @@ func TestStreamMigrateStreamsMismatch(t *testing.T) {
 	_, _, err = tme.wr.SwitchWrites(ctx, tme.targetKeyspace, "test", 1*time.Second, false, false, true, false, false)
 	want := "streams are mismatched across source shards"
 	if err == nil || !strings.Contains(err.Error(), want) {
-		t.Errorf("SwitchWrites err: %v, must contain %v", err, want)
+		assert("SwitchWrites err: %v, must contain %v", err, want)
 	}
 	verifyQueries(t, tme.allDBClients)
 }
