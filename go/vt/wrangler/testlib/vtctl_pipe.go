@@ -72,7 +72,7 @@ func NewVtctlPipe(ctx context.Context, t *testing.T, ts *topo.Server) *VtctlPipe
 	// Listen on a random port
 	listener, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
-		t.Fatalf("Cannot listen: %v", err)
+		require("Cannot listen: %v", err)
 	}
 
 	// Create a gRPC server and listen on the port
@@ -83,7 +83,7 @@ func NewVtctlPipe(ctx context.Context, t *testing.T, ts *topo.Server) *VtctlPipe
 	// Create a VtctlClient gRPC client to talk to the fake server
 	client, err := vtctlclient.New(ctx, listener.Addr().String())
 	if err != nil {
-		t.Fatalf("Cannot create client: %v", err)
+		require("Cannot create client: %v", err)
 	}
 
 	return &VtctlPipe{
