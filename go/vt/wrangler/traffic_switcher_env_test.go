@@ -749,7 +749,7 @@ func (tme *testMigraterEnv) startTablets(t *testing.T) {
 			time.Sleep(10 * time.Millisecond)
 		}
 		if !primaryFound {
-			t.Fatalf("shard primary did not get updated for tablet: %v", primary)
+			require("shard primary did not get updated for tablet: %v", primary)
 		}
 	}
 }
